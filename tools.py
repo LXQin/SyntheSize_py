@@ -230,34 +230,6 @@ def heatmap_eval(dat_generated, dat_real):
 def UMAP_eval(dat_generated, dat_real, groups_generated, groups_real, legend_pos="top"):
     # Filter out features with zero variance in generated data
     non_zero_var_cols = dat_generated.var(axis=0) != 0
-    dat_real = dat_real[:, non_zero_var_cols]
-    dat_generated = dat_generated[:, non_zero_var_cols]
-
-    # Combine datasets
-    combined_data = np.vstack((dat_real, dat_generated))
-    combined_groups = np.concatenate((groups_real, groups_generated))
-    combined_labels = np.array(['Real'] * dat_real.shape[0] + ['Generated'] * dat_generated.shape[0])
-
-    # UMAP dimensionality reduction
-    reducer = UMAP(random_state=42)
-    embedding = reducer.fit_transform(combined_data)
-
-    # Creating a DataFrame for visualization
-    umap_df = pd.DataFrame(embedding, columns=['UMAP1', 'UMAP2'])
-    umap_df['Data Type'] = combined_labels
-    umap_df['Group'] = combined_groups
-
-    # Plotting
-    plt.figure(figsize=(10, 8))
-    sns.scatterplot(data=umap_df, x='UMAP1', y='UMAP2', hue='Data Type', style='Group', palette='bright')
-    plt.legend(title='Data Type/Group', loc=legend_pos)
-    plt.title('UMAP Projection of Real and Generated Data')
-    plt.show()
-
-
-def UMAP_eval(dat_generated, dat_real, groups_generated, groups_real, legend_pos="top"):
-    # Filter out features with zero variance in generated data
-    non_zero_var_cols = dat_generated.var(axis=0) != 0
 
     # Use loc to filter columns by the non_zero_var_cols boolean mask
     dat_real = dat_real.loc[:, non_zero_var_cols]
@@ -364,12 +336,15 @@ def fit_curve(acc_table, metric_name, n_target=None, plot=True, ax=None, annotat
 
 
 
-def vis_classifier(metric_generated, metric_real, n_target):
+def vis_classifier(metric_real, n_target, metric_generated = None):
     methods = metric_real['method'].unique()
     num_methods = len(methods)
     
     # Create a subplot grid: one row per method, two columns per row
-    fig, axs = plt.subplots(num_methods, 2, figsize=(15, 5 * num_methods))
+    cols = 2
+    if metric_generated is None:
+        cols = 1
+    fig, axs = plt.subplots(num_methods, cols, figsize=(15, 5 * num_methods))
     if num_methods == 1:
         axs = [axs]  # Ensure axs is iterable when there's only one method
 
@@ -382,17 +357,22 @@ def vis_classifier(metric_generated, metric_real, n_target):
     for i, method in enumerate(methods):
         print(method)
         mean_acc_real = mean_metrics(metric_real[metric_real['method'] == method], 'accuracy')
-        mean_acc_generated = mean_metrics(metric_generated[metric_generated['method'] == method], 'accuracy')
+        if metric_generated is not None:
+            mean_acc_generated = mean_metrics(metric_generated[metric_generated['method'] == method], 'accuracy')
 
         # Plot real data on the left column
-        ax_real = axs[i][0]
+        if metric_generated is None:
+            ax_real = axs[i]
+        else:
+            ax_real = axs[i][0]
         fit_curve(mean_acc_real, 'accuracy', n_target=n_target, plot=True,
                   ax=ax_real, annotation=("Accuracy", f"{method}: TCGA"))
 
         # Plot generated data on the right column
-        ax_generated = axs[i][1]
-        fit_curve(mean_acc_generated, 'accuracy', n_target=n_target, plot=True,
-                  ax=ax_generated, annotation=("Accuracy", f"{method}: Generated"))
+        if metric_generated is not None:
+            ax_generated = axs[i][1]
+            fit_curve(mean_acc_generated, 'accuracy', n_target=n_target, plot=True,
+                    ax=ax_generated, annotation=("Accuracy", f"{method}: Generated"))
 
     plt.tight_layout()
     plt.show()
