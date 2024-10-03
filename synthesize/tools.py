@@ -54,8 +54,20 @@ for pkg in python_packages:
 
 
 def LOGIS(train_data, train_labels, test_data, test_labels):
-    # Define the model. The 'l1' penalty is for Lasso. Solver 'liblinear' is recommended for small datasets and L1 penalty.
-    # Cs represents the inverse of regularization strength; smaller values specify stronger regularization.
+    r"""This is an L1 or Lasso regression classifier.
+    
+    Parameters
+    -----------
+    train_data : pd.DataFrame
+            the training data
+    train_labels : pd.DataFrame
+            the labels of the training data
+    test_data : pd.DataFrame
+            the test data
+    test_labels : pd.DataFrame
+            the labels of the test data
+
+    """
     model = LogisticRegressionCV(Cs=10, cv=5, penalty='l1', solver='liblinear', scoring='accuracy', random_state=0,
                                  max_iter=1000)
 
@@ -80,6 +92,20 @@ def LOGIS(train_data, train_labels, test_data, test_labels):
 
 
 def SVM(train_data, train_labels, test_data, test_labels):
+    r"""This is a Support Vector Machine classifier.
+
+    Parameters
+    -----------
+    train_data : pd.DataFrame
+            the training data
+    train_labels : pd.DataFrame
+            the labels of the training data
+    test_data : pd.DataFrame
+            the test data
+    test_labels : pd.DataFrame
+            the labels of the test data
+    
+    """
     model = SVC(probability=True)
     model.fit(train_data, train_labels)
 
@@ -94,6 +120,20 @@ def SVM(train_data, train_labels, test_data, test_labels):
 
 
 def KNN(train_data, train_labels, test_data, test_labels):
+    r"""This is a K-Nearest Neighbor classifier.
+
+    Parameters
+    -----------
+    train_data : pd.DataFrame
+            the training data
+    train_labels : pd.DataFrame
+            the labels of the training data
+    test_data : pd.DataFrame
+            the test data
+    test_labels : pd.DataFrame
+            the labels of the test data
+    
+    """
     model = KNeighborsClassifier(n_neighbors=15)
     model.fit(train_data, train_labels)
 
@@ -115,6 +155,20 @@ def KNN(train_data, train_labels, test_data, test_labels):
 
 
 def RF(train_data, train_labels, test_data, test_labels):
+    r"""This is a Random Forest classifier.
+
+    Parameters
+    -----------
+    train_data : pd.DataFrame
+            the training data
+    train_labels : pd.DataFrame
+            the labels of the training data
+    test_data : pd.DataFrame
+            the test data
+    test_labels : pd.DataFrame
+            the labels of the test data
+    
+    """
     model = RandomForestClassifier(n_estimators=100)
     model.fit(train_data, train_labels)
 
@@ -128,6 +182,20 @@ def RF(train_data, train_labels, test_data, test_labels):
     return res
 
 def XGB(train_data, train_labels, test_data, test_labels):
+    r"""This is an XGBoost classifier. 
+
+    Parameters
+    -----------
+    train_data : pd.DataFrame
+            the training data
+    train_labels : pd.DataFrame
+            the labels of the training data
+    test_data : pd.DataFrame
+            the test data
+    test_labels : pd.DataFrame
+            the labels of the test data
+    
+    """
     dtrain = DMatrix(train_data, label=train_labels)
     dtest = DMatrix(test_data, label=test_labels)
     # Parameters and model training
@@ -142,6 +210,24 @@ def XGB(train_data, train_labels, test_data, test_labels):
 # Assuming LOGIS, SVM, KNN, RF, and XGB functions are defined as previously discussed
 
 def eval_classifier(whole_generated, whole_groups, n_candidate, n_draw=5, log=True):
+    r"""
+    This function assesses the classifiers’ accuracy through 5-fold cross-validation for several candidate sample sizes. For each classifier and each candidate sample size, n_draw random sample will be taken from the whole_generated data to train the classifier. The final accuracy will be average accuracy over the random draws. The output will be used to fit the IPLF.
+
+    Parameters
+    -----------
+    whole_generated : pd.DataFrame
+            the entire set of generated data
+    whole_groups: pd.DataFrame
+            the group labels for the whole_generated data
+    n_candidate : int
+            the candidate total sample sizes, half of them for each group label, should be smaller than the size of the whole generated data
+    n_draw : int, optional
+            the number of times drawing n_candidate from the whole_generated
+    log : boolean, optional
+            whether the data is log2 transformed
+
+
+    """
     if not log:
         whole_generated = np.log2(whole_generated + 1)
 
@@ -211,6 +297,17 @@ def eval_classifier(whole_generated, whole_groups, n_candidate, n_draw=5, log=Tr
     return pd.DataFrame(results)
 
 def heatmap_eval(dat_real,dat_generated):
+    r"""
+    This function creates a heatmap visualization comparing the generated data and the real data.
+
+    Parameters
+    -----------
+    dat_generated : pd.DataFrame
+            the generated data
+    dat_real: pd.DataFrame
+            the original copy of the data
+    
+    """
     if dat_generated is None:
         # Only plot dat_real if dat_generated is None
         plt.figure(figsize=(6, 6))
@@ -236,6 +333,23 @@ def heatmap_eval(dat_real,dat_generated):
 
 
 def UMAP_eval(dat_generated, dat_real, groups_generated, groups_real, random_state = 42, legend_pos="top"):
+    r"""
+    This function creates a UMAP visualization comparing the generated data and the real data.
+
+    Parameters
+    -----------
+    dat_generated : pd.DataFrame
+            the generated data
+    dat_real: pd.DataFrame
+            the original copy of the data
+    groups_generated : pd.Series
+            the groups generated
+    groups_real : pd.Series
+            the real groups
+    legend_pos : string
+            legend location
+    
+    """
     # Filter out features with zero variance in generated data
     non_zero_var_cols = dat_generated.var(axis=0) != 0
 
@@ -312,6 +426,20 @@ def fit_curve(acc_table, metric_name, n_target=None, plot=True, ax=None, annotat
 
 
 def vis_classifier(metric_real, n_target, metric_generated = None):
+    r""" 
+    This function visualizes the IPLF fitted from the real samples (if provided) and the generated samples. 
+    
+    Parameters
+    -----------
+    metric_real : pd.DataFrame
+            the metrics including candidate sample size and average accuracy for the fitting of IPLF. Usually be the output from the eval_classifers applied to the real data
+    n_target: int
+            the sample sizes beyond the range of the candidate sample sizes, where the classification accuracy at these sample sizes will be predicted based on the fitted IPLF.
+    metric_generated : pd.DataFrame, optional
+           the metrics including candidate sample size and average accuracy for the fitting of IPLF. Usually be the output from the eval_classifers applied to the generated data
+    
+    
+    """
     methods = metric_real['method'].unique()
     num_methods = len(methods)
     
@@ -351,6 +479,3 @@ def vis_classifier(metric_real, n_target, metric_generated = None):
 
     plt.tight_layout()
     plt.show()
-    
-    
-
