@@ -6,7 +6,7 @@ Classification Methods
 Logistic Regression
 ------------
 
-.. autofunction:: testing.python.tools.LOGIS
+.. autofunction:: synthesize.tools.LOGIS
 
 
 .. _svm:
@@ -14,7 +14,7 @@ Logistic Regression
 Support Vector Machine
 ----------------
 
-.. autofunction:: testing.python.tools.SVM
+.. autofunction:: synthesize.tools.SVM
 
 
 .. _knn:
@@ -22,7 +22,7 @@ Support Vector Machine
 K-Nearest Neighbors
 ----------------
 
-.. autofunction:: testing.python.tools.KNN
+.. autofunction:: synthesize.tools.KNN
 
 
 
@@ -31,7 +31,7 @@ K-Nearest Neighbors
 Random Forest
 ------------
 
-.. autofunction:: testing.python.tools.RF
+.. autofunction:: synthesize.tools.RF
 
 
 
@@ -40,7 +40,7 @@ Random Forest
 XGBoost
 ------------
 
-.. autofunction:: testing.python.tools.XGB
+.. autofunction:: synthesize.tools.XGB
 
 
 

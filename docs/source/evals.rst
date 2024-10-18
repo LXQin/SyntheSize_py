@@ -6,14 +6,14 @@ Evaluations
 Heatmap  
 ------------
 
-.. autofunction:: testing.python.tools.heatmap_eval
+.. autofunction:: synthesize.tools.heatmap_eval
 
 .. _umap:
 
 UMAP
 ----------------
 
-.. autofunction:: testing.python.tools.UMAP_eval
+.. autofunction:: synthesize.tools.UMAP_eval
 
 
 .. _evaluation:
@@ -21,11 +21,11 @@ UMAP
 Classifier Evaluation
 ----------------
 
-.. autofunction:: testing.python.tools.eval_classifier
+.. autofunction:: synthesize.tools.eval_classifier
 
 .. _vis:
 
 Classifier Visualization
 ------------
 
-.. autofunction:: testing.python.tools.vis_classifier
+.. autofunction:: synthesize.tools.vis_classifier
