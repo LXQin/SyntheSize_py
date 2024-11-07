@@ -427,7 +427,7 @@ def fit_curve(acc_table, metric_name, n_target=None, plot=True, ax=None, annotat
 
 def vis_classifier(metric_real, n_target, metric_generated = None):
     r""" 
-    This function visualizes the IPLF fitted from the real samples (if provided) and the generated samples. 
+    This function visualizes the IPLF fitted from the real samples and the generated samples (if provided). 
     
     Parameters
     -----------
