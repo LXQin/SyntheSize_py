@@ -350,6 +350,23 @@ def UMAP_eval(dat_generated, dat_real, groups_generated, groups_real, random_sta
             legend location
     
     """
+
+    if dat_generated is None and groups_generated is None:
+        # Only plot the real data
+        reducer = UMAP(random_state=random_state)
+        embedding = reducer.fit_transform(dat_real.values)
+
+        umap_df = pd.DataFrame(embedding, columns=['UMAP1', 'UMAP2'])
+        umap_df['Group'] = groups_real.astype(str)  # Ensure groups are hashable for seaborn
+
+        # Plotting
+        plt.figure(figsize=(10, 8))
+        sns.scatterplot(data=umap_df, x='UMAP1', y='UMAP2', style='Group', palette='bright')
+        plt.legend(title='Group', loc=legend_pos)
+        plt.title('UMAP Projection of Real Data')
+        plt.show()
+        return
+    
     # Filter out features with zero variance in generated data
     non_zero_var_cols = dat_generated.var(axis=0) != 0
 
