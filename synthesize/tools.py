@@ -296,16 +296,16 @@ def eval_classifier(whole_generated, whole_groups, n_candidate, n_draw=5, log=Tr
 
     return pd.DataFrame(results)
 
-def heatmap_eval(dat_real,dat_generated):
+def heatmap_eval(dat_real,dat_generated=None):
     r"""
     This function creates a heatmap visualization comparing the generated data and the real data.
 
     Parameters
     -----------
-    dat_generated : pd.DataFrame
-            the generated data
     dat_real: pd.DataFrame
             the original copy of the data
+    dat_generated : pd.DataFrame, optional
+            the generated data
     
     """
     if dat_generated is None:
@@ -339,11 +339,11 @@ def UMAP_eval(dat_generated, dat_real, groups_generated, groups_real, random_sta
     Parameters
     -----------
     dat_generated : pd.DataFrame
-            the generated data
+            the generated data, input None if unavailable
     dat_real: pd.DataFrame
             the original copy of the data
     groups_generated : pd.Series
-            the groups generated
+            the groups generated, input None if unavailable
     groups_real : pd.Series
             the real groups
     legend_pos : string
