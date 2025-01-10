@@ -296,16 +296,17 @@ def eval_classifier(whole_generated, whole_groups, n_candidate, n_draw=5, log=Tr
 
     return pd.DataFrame(results)
 
-def heatmap_eval(dat_real,dat_generated):
+def heatmap_eval(dat_real,dat_generated=None):
     r"""
     This function creates a heatmap visualization comparing the generated data and the real data.
+    dat_generated is applicable only if 2 sets of data is available.
 
     Parameters
     -----------
-    dat_generated : pd.DataFrame
-            the generated data
     dat_real: pd.DataFrame
             the original copy of the data
+    dat_generated : pd.DataFrame, optional
+            the generated data
     
     """
     if dat_generated is None:
@@ -335,21 +336,39 @@ def heatmap_eval(dat_real,dat_generated):
 def UMAP_eval(dat_generated, dat_real, groups_generated, groups_real, random_state = 42, legend_pos="top"):
     r"""
     This function creates a UMAP visualization comparing the generated data and the real data.
+    If only 1 set of data is available, dat_generated and groups_generated should have None as inputs.
 
     Parameters
     -----------
     dat_generated : pd.DataFrame
-            the generated data
+            the generated data, input None if unavailable
     dat_real: pd.DataFrame
             the original copy of the data
     groups_generated : pd.Series
-            the groups generated
+            the groups generated, input None if unavailable
     groups_real : pd.Series
             the real groups
     legend_pos : string
             legend location
     
     """
+
+    if dat_generated is None and groups_generated is None:
+        # Only plot the real data
+        reducer = UMAP(random_state=random_state)
+        embedding = reducer.fit_transform(dat_real.values)
+
+        umap_df = pd.DataFrame(embedding, columns=['UMAP1', 'UMAP2'])
+        umap_df['Group'] = groups_real.astype(str)  # Ensure groups are hashable for seaborn
+
+        # Plotting
+        plt.figure(figsize=(10, 8))
+        sns.scatterplot(data=umap_df, x='UMAP1', y='UMAP2', style='Group', palette='bright')
+        plt.legend(title='Group', loc=legend_pos)
+        plt.title('UMAP Projection of Real Data')
+        plt.show()
+        return
+    
     # Filter out features with zero variance in generated data
     non_zero_var_cols = dat_generated.var(axis=0) != 0
 
@@ -427,7 +446,7 @@ def fit_curve(acc_table, metric_name, n_target=None, plot=True, ax=None, annotat
 
 def vis_classifier(metric_real, n_target, metric_generated = None):
     r""" 
-    This function visualizes the IPLF fitted from the real samples (if provided) and the generated samples. 
+    This function visualizes the IPLF fitted from the real samples and the generated samples (if provided). 
     
     Parameters
     -----------
