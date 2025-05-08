@@ -98,6 +98,7 @@ def get_data_metrics(real_file_name, generated_file_name):
     real_data = real.iloc[:, :-1]
     real_data = np.log2(real_data + 1)  # Log-transform real data
     generated_data = generated.iloc[:, :-1]
+    unique_types = real['groups'].unique()
 
     # Return processed matrices and labels
     return real_data, groups_real, generated_data, groups_generated, unique_types
