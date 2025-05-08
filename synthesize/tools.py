@@ -7,7 +7,6 @@ from sklearn.metrics import f1_score, roc_auc_score, accuracy_score
 import numpy as np
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import accuracy_score, roc_auc_score
 from sklearn.ensemble import RandomForestClassifier
 
 import xgboost as xgb
