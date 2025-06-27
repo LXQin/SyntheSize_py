@@ -77,7 +77,8 @@ def LOGIS(train_data, train_labels, test_data, test_labels):
     predictions_proba = model.predict_proba(test_data)
 
     # Convert probabilities to binary predictions using 0.5 as the threshold.
-    predictions = (predictions_proba > 0.5).astype(int)
+    # predictions = (predictions_proba > 0.5).astype(int)
+    predictions = model.predict(test_data)
 
     # Calculate AUC for binary classification / multi-classification
     if predictions_proba.shape[1] == 2:
@@ -143,6 +144,7 @@ def KNN(train_data, train_labels, test_data, test_labels):
     model.fit(train_data, train_labels)
 
     # Predict the class labels for the provided data
+    predictions_proba = model.predict_proba(test_data)
     predictions = model.predict(test_data)
 
     # Predict class probabilities for the positive class
@@ -598,7 +600,7 @@ def visualize(real_data, groups_real, unique_types, generated_data=None, groups_
 
 
 
-def vis_classifier(metric_real, n_target, metric_generated=None, metric_name='f1_score'):
+def vis_classifier(metric_real, n_target, metric_generated=None, metric_name='f1_score', save = False):
     r""" 
     Visualize the IPLF (learning curve) fitted from the real and optionally generated samples.
 
@@ -649,4 +651,7 @@ def vis_classifier(metric_real, n_target, metric_generated=None, metric_name='f1
                       ax=ax_gen, annotation=(metric_name, f"{method}: Generated"))
 
     plt.tight_layout()
-    plt.show()
+    # plt.show()
+
+    if save:
+        return fig
