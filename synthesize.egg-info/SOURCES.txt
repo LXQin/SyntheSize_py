@@ -1,7 +1,6 @@
 README.md
 setup.py
 synthesize/__init__.py
-synthesize/metric_real_30.csv
 synthesize/tools.py
 synthesize.egg-info/PKG-INFO
 synthesize.egg-info/SOURCES.txt
