@@ -1,0 +1,354 @@
+---
+title: Use SyntheSize On Radimics Data
+jupyter: python3
+---
+
+```{python}
+
+```
+
+```{python}
+import os
+import sys
+import pandas as pd
+import numpy as np
+
+%load_ext autoreload
+%autoreload 2
+
+```
+
+```{python}
+os.chdir("/Users/kwhiting/Library/CloudStorage/OneDrive-MemorialSloanKetteringCancerCenter/Projects/Li_Xuan_Qin/SyntheSize_py")
+print(os.getcwd())
+
+# make it point to local version in case of changes
+sys.path.insert(0, os.path.join(os.getcwd(), "synthesize"))
+```
+
+```{python}
+# from tools import get_data_metrics, visualize, eval_classifier, vis_classifier
+from tools import get_data_metrics, visualize, eval_classifier, vis_classifier, heatmap_eval, UMAP_eval
+
+```
+
+```{python}
+os.chdir("/Users/kwhiting/Library/CloudStorage/OneDrive-MemorialSloanKetteringCancerCenter/Projects/Li_Xuan_Qin/SyntheSize_py/synthesize")
+
+# confirm
+print(os.getcwd())
+```
+
+
+
+
+```{python}
+
+# Visualize and evaluate real vs. generated data:
+# - Stratified sampling is performed within each group based on the real data
+# - 'ratio' determines the fraction of real samples to visualize per class
+# - Heatmaps show the expression patterns of both datasets
+# - UMAP plots show group-wise structure in 2D space
+# - If generated data is None, only real data is visualized
+#visualize(real, groups_real, unique_types, generated, groups_generated, ratio=1, seed=88)
+```
+
+
+```{python}
+# === Input Real Data Description ===
+# - 'samples': sample IDs (need to be removed)
+# - 'groups': class labels (string or numeric; mapped to 0/1 if needed)
+# - All other columns: raw feature values (e.g., expression counts)
+# - The feature values in real need to be log-transformed: log2(real + 1)
+
+real_file_name = r"./Case/processed_train_136_full_model_data.csv" # Please replace it with your actual file path
+
+# === Input Generated Data Description ===
+# - generated.csv has the same columns as real except for samples
+# - The features are already log-transformed
+# - Group labels (0 or 1) are in the last column
+generated_file_name = r"./Case/processed_train_136_full_model_data_epochES_batch01_CVAE1-5_generated.csv" # Please replace it with your actual file path
+
+real_raw = pd.read_csv(real_file_name)
+generated_raw = pd.read_csv(generated_file_name, header=0)
+```
+
+
+Note, the get_data_metrics function expects the real data in raw form (e.g. not log2 transformed) but the generated data in the log transformed form.
+
+
+```{python}
+
+# Load and preprocess real and generated datasets. This returns:
+# - real_data: log2-transformed numeric features from the real dataset
+# - groups_real: binary-encoded labels (0/1) for the real data
+# - generated_data: numeric features from the generated dataset
+# - groups_generated: group labels from the generated data
+# - unique_types: array of unique class labels (e.g., [0, 1])
+real, groups_real, generated, groups_generated, unique_types = get_data_metrics(real_file_name, generated_file_name)
+```
+
+```{python}
+heatmap_eval(real, generated)
+```
+
+```{python}
+# Drop NaNs in real data
+mask_real = ~real.isna().any(axis=1)  # True for rows without NaNs
+real_clean = real[mask_real]
+groups_real_clean = groups_real[mask_real]
+
+# Drop NaNs in generated data
+mask_generated = ~generated.isna().any(axis=1)  # True for rows without NaNs
+generated_clean = generated[mask_generated]
+groups_generated_clean = groups_generated[mask_generated]
+
+UMAP_eval(
+    dat_real=real_clean,
+    dat_generated=generated_clean,
+    groups_real=groups_real_clean,
+    groups_generated=groups_generated_clean,
+    legend_pos="bottom")
+
+```
+
+```{python}
+import pandas as pd
+
+# Count missing values in each column
+missing_counts = real.isna().sum()
+
+# Display columns that actually have missing values
+print(missing_counts[missing_counts > 0])
+```
+
+```{python}
+
+print(generated.isna().sum())
+```
+
+
+
+
+
+```{python}
+def heatmap_eval(dat_real,dat_generated=None):
+    r"""
+    This function creates a heatmap visualization comparing the generated data and the real data.
+    dat_generated is applicable only if 2 sets of data is available.
+
+    Parameters
+    -----------
+    dat_real: pd.DataFrame
+            the original copy of the data
+    dat_generated : pd.DataFrame, optional
+            the generated data
+    
+    """
+    if dat_generated is None:
+        # Only plot dat_real if dat_generated is None
+        plt.figure(figsize=(6, 6))
+        sns.heatmap(dat_real, cbar=True)
+        plt.title('Real Data')
+        plt.xlabel('Features')
+        plt.ylabel('Samples')
+    else:
+        # Plot both dat_generated and dat_real side by side
+        fig, axs = plt.subplots(ncols=2, figsize=(12, 6),
+                                gridspec_kw=dict(width_ratios=[0.5, 0.55]))
+
+        sns.heatmap(dat_generated, ax=axs[0], cbar=False)
+        axs[0].set_title('Generated Data')
+        axs[0].set_xlabel('Features')
+        axs[0].set_ylabel('Samples')
+
+        sns.heatmap(dat_real, ax=axs[1], cbar=True)
+        axs[1].set_title('Real Data')
+        axs[1].set_xlabel('Features')
+        axs[1].set_ylabel('Samples')
+```
+
+```{python}
+
+def visualize(real_data, groups_real, unique_types, generated_data=None, groups_generated=None, ratio=1, seed=42):
+    """
+    Visualize real and optionally generated data using heatmap and UMAP projections.
+
+    Supports both binary and multi-class settings. For each class, samples from both datasets
+    are drawn based on real data class proportions.
+
+    Parameters
+    ----------
+    real_data : pd.DataFrame
+        Feature matrix of real dataset (without 'groups' column).
+    groups_real : pd.Series
+        Group labels for the real dataset.
+    unique_types : array-like
+        Unique class labels to iterate over.
+    generated_data : pd.DataFrame, optional
+        Feature matrix of generated dataset (same columns as real_data).
+    groups_generated : pd.Series, optional
+        Group labels for the generated dataset.
+    ratio : float, default=1
+        Sampling ratio within each class (based on real data).
+    seed : int, default=42
+        Random seed for reproducibility.
+    """
+    np.random.seed(seed)
+
+    real_indices = []
+    generated_indices = []
+
+    for group in unique_types:
+        # Sample from real
+        real_idx = np.where(groups_real == group)[0]
+        n_sample = round(len(real_idx) * ratio)
+        sampled_real = np.random.choice(real_idx, size=n_sample, replace=False)
+        real_indices.extend(sampled_real.tolist())
+
+        # Sample from generated if provided
+        if generated_data is not None and groups_generated is not None:
+            gen_idx = np.where(groups_generated == group)[0]
+            if len(gen_idx) < n_sample:
+                raise ValueError(f"Not enough samples in generated data for group '{group}'")
+            sampled_gen = np.random.choice(gen_idx, size=n_sample, replace=False)
+            generated_indices.extend(sampled_gen.tolist())
+
+    # Heatmap
+    if generated_data is None:
+        heatmap_eval(dat_real=real_data.iloc[real_indices, :])
+    else:
+        heatmap_eval(
+            dat_real=real_data.iloc[real_indices, :],
+            dat_generated=generated_data.iloc[generated_indices, :]
+        )
+
+        # UMAP
+        # UMAP_eval(
+        #     dat_real=real_data.iloc[real_indices, :],
+        #     dat_generated=generated_data.iloc[generated_indices, :],
+        #     groups_real=groups_real.iloc[real_indices],
+        #     groups_generated=groups_generated.iloc[generated_indices],
+        #     legend_pos="bottom"
+        # )
+
+
+```
+
+```{python}
+visualize(real, groups_real, unique_types, generated, groups_generated, ratio=1, seed=88)
+```
+
+```{python}
+
+# Visualize and evaluate real vs. generated data:
+# - Stratified sampling is performed within each group based on the real data
+# - 'ratio' determines the fraction of real samples to visualize per class
+# - Heatmaps show the expression patterns of both datasets
+# - UMAP plots show group-wise structure in 2D space
+# - If generated data is None, only real data is visualized
+visualize(real, groups_real, unique_types, generated, groups_generated, ratio=1, seed=88)
+```
+
+```{python}
+# If we only have the real samples...
+visualize(real, groups_real, unique_types, ratio=1, seed=88)
+```
+
+# PRADSubtype classification accurary multiple classifier
+
+```{python}
+# Create candidate sample sizes ranging from 'step' to the full size of real data
+step = len(real) // 30
+n_candidate = np.arange(step, len(real) + 1, step)
+n_candidate = n_candidate[(n_candidate >= 12) & (n_candidate <= len(real))]
+
+# Define target sizes that go beyond the candidate range (extrapolation)
+n_target = np.array([n_candidate[-1] + x * step for x in range(1, 4)])
+print(f'n_candidate: {n_candidate}\nn_target: {n_target}')
+```
+
+```{python}
+#| scrolled: true
+# Evaluate the classifier for real data
+metric_real = eval_classifier(whole_generated=real,
+                              whole_groups=groups_real,
+                              n_candidate=n_candidate,
+                              n_draw=30, log=True)
+
+# Save the results to csv file if necessary
+metric_real.to_csv(f'LIHCSubtypeFamInd_DESeq_metric_real.csv', index=False)
+```
+
+```{python}
+#| scrolled: true
+# Evaluate the classifier for generated data
+metric_generated = eval_classifier(whole_generated=generated,
+                                   whole_groups=groups_generated,
+                                   n_candidate=n_candidate,
+                                   n_draw=30, log=True)
+
+# Save the results to csv file if necessary
+metric_generated.to_csv(f'LIHCSubtypeFamInd_DESeq_metric_generated.csv', index=False)
+```
+
+```{python}
+# If we have already saved the results
+# metric_real = pd.read_csv(f'PRADSubtype_icd_o_3_histology_metric_real.csv',header = 0)
+# metric_generated = pd.read_csv(f'PRADSubtype_icd_o_3_histology_metric_generated.csv',header = 0)
+```
+
+```{python}
+# Visualize the classifier performance
+import matplotlib.pyplot as plt
+p_acc = vis_classifier(metric_generated=metric_generated,
+                       metric_real=metric_real,
+                       metric_name='f1_score',
+                       n_target=n_target, save = False)
+```
+
+```{python}
+real_file_name = r"./Case/LIHCSubtypeFamInd_test74.csv"
+generated_file_name = r"./Case/LIHCSubtypeFamInd_train294_epochES_batch01_CVAE1-10_generated.csv"
+real, groups_real, generated, groups_generated, unique_types = get_data_metrics(real_file_name, generated_file_name)
+```
+
+```{python}
+step = len(real) // 30
+n_candidate = np.arange(step, len(real) + 1, step)
+n_candidate = n_candidate[(n_candidate >= 12) & (n_candidate <= len(real))]
+
+# Define target sizes that go beyond the candidate range (extrapolation)
+n_target = np.array([n_candidate[-1] + x * step for x in range(1, 4)])
+print(f'n_candidate: {n_candidate}\nn_target: {n_target}')
+```
+
+```{python}
+metric_real = eval_classifier(whole_generated=real,
+                              whole_groups=groups_real,
+                              n_candidate=n_candidate,
+                              n_draw=30, log=True)
+
+# Save the results to csv file if necessary
+metric_real.to_csv(f'LIHCSubtypeFamInd_metric_real.csv', index=False)
+```
+
+```{python}
+#| scrolled: true
+metric_generated = eval_classifier(whole_generated=generated,
+                                   whole_groups=groups_generated,
+                                   n_candidate=n_candidate,
+                                   n_draw=30, log=True)
+
+# Save the results to csv file if necessary
+metric_generated.to_csv(f'LIHCSubtypeFamInd_metric_generated.csv', index=False)
+```
+
+```{python}
+import matplotlib.pyplot as plt
+p_acc = vis_classifier(metric_generated=metric_generated,
+                       metric_real=metric_real,
+                       metric_name='f1_score',
+                       n_target=n_target, save = False)
+```
+
