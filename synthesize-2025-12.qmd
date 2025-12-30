@@ -3,9 +3,7 @@ title: Use SyntheSize On Radimics Data
 jupyter: python3
 ---
 
-```{python}
 
-```
 
 ```{python}
 import os
@@ -19,7 +17,12 @@ import numpy as np
 ```
 
 ```{python}
-os.chdir("/Users/kwhiting/Library/CloudStorage/OneDrive-MemorialSloanKetteringCancerCenter/Projects/Li_Xuan_Qin/SyntheSize_py")
+cwd = os.getcwd()
+cwd
+```
+
+```{python}
+# os.chdir("/Users/kwhiting/Library/CloudStorage/OneDrive-MemorialSloanKetteringCancerCenter/Projects/Li_Xuan_Qin/SyntheSize_py")
 print(os.getcwd())
 
 # make it point to local version in case of changes
@@ -33,12 +36,15 @@ from tools import get_data_metrics, visualize, eval_classifier, vis_classifier, 
 ```
 
 ```{python}
-os.chdir("/Users/kwhiting/Library/CloudStorage/OneDrive-MemorialSloanKetteringCancerCenter/Projects/Li_Xuan_Qin/SyntheSize_py/synthesize")
+# Append 'synthesize' and change to that folder
+#synthesize_path = os.path.join(cwd, "synthesize")
+#os.chdir(synthesize_path)
+```
 
+```{python}
 # confirm
 print(os.getcwd())
 ```
-
 
 
 
