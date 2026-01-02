@@ -1,2 +1,5 @@
 .DS_Store
 Case/*.csv
+dist/
+build/
+*.egg-info/
