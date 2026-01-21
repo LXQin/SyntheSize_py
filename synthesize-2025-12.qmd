@@ -30,8 +30,8 @@ sys.path.insert(0, os.path.join(os.getcwd(), "synthesize"))
 ```
 
 ```{python}
-# from tools import get_data_metrics, visualize, eval_classifier, vis_classifier
-from tools import get_data_metrics, visualize, eval_classifier, vis_classifier, heatmap_eval, UMAP_eval
+# from core import get_data_metrics, visualize, eval_classifier, vis_classifier
+from core import get_data_metrics, visualize, eval_classifier, vis_classifier, heatmap_eval, UMAP_eval
 
 ```
 

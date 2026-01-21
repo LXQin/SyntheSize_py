@@ -6,7 +6,7 @@ Classification Methods
 Logistic Regression
 ------------
 
-.. autofunction:: synthesize.tools.LOGIS
+.. autofunction:: synthesize.core.LOGIS
 
 
 .. _svm:
@@ -14,7 +14,7 @@ Logistic Regression
 Support Vector Machine
 ----------------
 
-.. autofunction:: synthesize.tools.SVM
+.. autofunction:: synthesize.core.SVM
 
 
 .. _knn:
@@ -22,7 +22,7 @@ Support Vector Machine
 K-Nearest Neighbors
 ----------------
 
-.. autofunction:: synthesize.tools.KNN
+.. autofunction:: synthesize.core.KNN
 
 
 
@@ -31,7 +31,7 @@ K-Nearest Neighbors
 Random Forest
 ------------
 
-.. autofunction:: synthesize.tools.RF
+.. autofunction:: synthesize.core.RF
 
 
 
@@ -40,7 +40,7 @@ Random Forest
 XGBoost
 ------------
 
-.. autofunction:: synthesize.tools.XGB
+.. autofunction:: synthesize.core.XGB
 
 
 

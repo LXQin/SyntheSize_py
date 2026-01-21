@@ -24,7 +24,6 @@ from scipy.stats import norm
 from scipy.optimize import approx_fprime
 
 
-
 def install_and_import(package):
     try:
         __import__(package)
@@ -39,11 +38,12 @@ def install_and_import(package):
 python_packages = [
     "plotnine",  # ggplot2 equivalent
     "pandas",  # part of tidyverse equivalent
-    "matplotlib", "seaborn",  # part of cowplot, ggpubr, ggsci equivalents
+    "matplotlib",
+    "seaborn",  # part of cowplot, ggpubr, ggsci equivalents
     # "scikit-learn", # part of glmnet, e1071, caret, class equivalents
     "xgboost",  # direct equivalent
-    "numpy", "scipy"
-
+    "numpy",
+    "scipy",
 ]
 
 # Loop through the list and apply the function
@@ -51,10 +51,9 @@ for pkg in python_packages:
     install_and_import(pkg)
 
 
-
 def LOGIS(train_data, train_labels, test_data, test_labels):
     r"""This is an Ridge regression classifier.
-    
+
     Parameters
     -----------
     train_data : pd.DataFrame
@@ -67,8 +66,15 @@ def LOGIS(train_data, train_labels, test_data, test_labels):
             the labels of the test data
 
     """
-    model = LogisticRegressionCV(Cs=10, cv=5, penalty='l2', solver='liblinear', scoring='accuracy', random_state=0,
-                                 max_iter=1000)
+    model = LogisticRegressionCV(
+        Cs=10,
+        cv=5,
+        penalty="l2",
+        solver="liblinear",
+        scoring="accuracy",
+        random_state=0,
+        max_iter=1000,
+    )
 
     # Fit the model
     model.fit(train_data, train_labels)
@@ -84,14 +90,16 @@ def LOGIS(train_data, train_labels, test_data, test_labels):
     if predictions_proba.shape[1] == 2:
         auc = roc_auc_score(test_labels, predictions_proba[:, 1])
     else:
-        auc = roc_auc_score(test_labels, predictions_proba, multi_class='ovo', average='macro')
+        auc = roc_auc_score(
+            test_labels, predictions_proba, multi_class="ovo", average="macro"
+        )
 
     return {
-        'f1': f1_score(test_labels, predictions, average='macro'),
-        'accuracy': accuracy_score(test_labels, predictions),
-        'auc': auc
+        "f1": f1_score(test_labels, predictions, average="macro"),
+        "accuracy": accuracy_score(test_labels, predictions),
+        "auc": auc,
     }
-    
+
 
 def SVM(train_data, train_labels, test_data, test_labels):
     r"""This is a Support Vector Machine classifier.
@@ -106,7 +114,7 @@ def SVM(train_data, train_labels, test_data, test_labels):
             the test data
     test_labels : pd.DataFrame
             the labels of the test data
-    
+
     """
     model = SVC(probability=True)
     model.fit(train_data, train_labels)
@@ -116,12 +124,14 @@ def SVM(train_data, train_labels, test_data, test_labels):
     if predictions_proba.shape[1] == 2:
         auc = roc_auc_score(test_labels, predictions_proba[:, 1])
     else:
-        auc = roc_auc_score(test_labels, predictions_proba, multi_class='ovo', average='macro')
+        auc = roc_auc_score(
+            test_labels, predictions_proba, multi_class="ovo", average="macro"
+        )
 
     return {
-        'f1': f1_score(test_labels, predictions, average='macro'),
-        'accuracy': accuracy_score(test_labels, predictions),
-        'auc': auc
+        "f1": f1_score(test_labels, predictions, average="macro"),
+        "accuracy": accuracy_score(test_labels, predictions),
+        "auc": auc,
     }
 
 
@@ -138,7 +148,7 @@ def KNN(train_data, train_labels, test_data, test_labels):
             the test data
     test_labels : pd.DataFrame
             the labels of the test data
-    
+
     """
     model = KNeighborsClassifier(n_neighbors=5)
     model.fit(train_data, train_labels)
@@ -149,14 +159,18 @@ def KNN(train_data, train_labels, test_data, test_labels):
 
     # Predict class probabilities for the positive class
     if predictions_proba.shape[1] == 2:
-        auc = roc_auc_score(test_labels, predictions_proba[:, 1]) # Binary classification, get probabilities for the positive class
+        auc = roc_auc_score(
+            test_labels, predictions_proba[:, 1]
+        )  # Binary classification, get probabilities for the positive class
     else:
-        auc = roc_auc_score(test_labels, predictions_proba, multi_class='ovo', average='macro')
+        auc = roc_auc_score(
+            test_labels, predictions_proba, multi_class="ovo", average="macro"
+        )
 
     return {
-        'f1': f1_score(test_labels, predictions, average='macro'),
-        'accuracy': accuracy_score(test_labels, predictions),
-        'auc': auc
+        "f1": f1_score(test_labels, predictions, average="macro"),
+        "accuracy": accuracy_score(test_labels, predictions),
+        "auc": auc,
     }
 
 
@@ -173,7 +187,7 @@ def RF(train_data, train_labels, test_data, test_labels):
             the test data
     test_labels : pd.DataFrame
             the labels of the test data
-    
+
     """
     model = RandomForestClassifier(n_estimators=100)
     model.fit(train_data, train_labels)
@@ -183,17 +197,19 @@ def RF(train_data, train_labels, test_data, test_labels):
     if predictions_proba.shape[1] == 2:
         auc = roc_auc_score(test_labels, predictions_proba[:, 1])
     else:
-        auc = roc_auc_score(test_labels, predictions_proba, multi_class='ovo', average='macro')
+        auc = roc_auc_score(
+            test_labels, predictions_proba, multi_class="ovo", average="macro"
+        )
 
     return {
-        'f1': f1_score(test_labels, predictions, average='macro'),
-        'accuracy': accuracy_score(test_labels, predictions),
-        'auc': auc
+        "f1": f1_score(test_labels, predictions, average="macro"),
+        "accuracy": accuracy_score(test_labels, predictions),
+        "auc": auc,
     }
 
 
 def XGB(train_data, train_labels, test_data, test_labels):
-    r"""This is an XGBoost classifier. 
+    r"""This is an XGBoost classifier.
 
     Parameters
     -----------
@@ -205,16 +221,20 @@ def XGB(train_data, train_labels, test_data, test_labels):
             the test data
     test_labels : pd.DataFrame
             the labels of the test data
-    
+
     """
     num_class = len(np.unique(train_labels))
     dtrain = DMatrix(train_data, label=train_labels)
     dtest = DMatrix(test_data, label=test_labels)
     # Parameters and model training
     if num_class == 2:
-        params = {'objective': 'binary:logistic', 'eval_metric': 'auc'}
+        params = {"objective": "binary:logistic", "eval_metric": "auc"}
     else:
-        params = {'objective': 'multi:softprob', 'num_class': num_class, 'eval_metric': 'mlogloss'}
+        params = {
+            "objective": "multi:softprob",
+            "num_class": num_class,
+            "eval_metric": "mlogloss",
+        }
     bst = xgb_train(params, dtrain, num_boost_round=10)
     predictions_proba = bst.predict(dtest)
     if predictions_proba.ndim == 1:
@@ -222,21 +242,26 @@ def XGB(train_data, train_labels, test_data, test_labels):
         auc = roc_auc_score(test_labels, predictions_proba)
     else:
         predictions = np.argmax(predictions_proba, axis=1)
-        auc = roc_auc_score(test_labels, predictions_proba, multi_class='ovo', average='macro')
-        
+        auc = roc_auc_score(
+            test_labels, predictions_proba, multi_class="ovo", average="macro"
+        )
+
     return {
-        'f1': f1_score(test_labels, predictions, average='macro'),
-        'accuracy': accuracy_score(test_labels, predictions),
-        'auc': auc
+        "f1": f1_score(test_labels, predictions, average="macro"),
+        "accuracy": accuracy_score(test_labels, predictions),
+        "auc": auc,
     }
 
 
 # Assuming LOGIS, SVM, KNN, RF, and XGB functions are defined as previously discussed
 
-def eval_classifier(whole_generated, whole_groups, n_candidate, n_draw=5, log=True, methods=None):
+
+def eval_classifier(
+    whole_generated, whole_groups, n_candidate, n_draw=5, log=True, methods=None
+):
     r"""
-    For each classifier and each candidate sample size, this function performs n_draw rounds of 
-    stratified sampling from the data (proportional to class distribution), applies 5-fold cross-validation, 
+    For each classifier and each candidate sample size, this function performs n_draw rounds of
+    stratified sampling from the data (proportional to class distribution), applies 5-fold cross-validation,
     and averages metrics across draws. Used to support IPLF fitting.
 
     Parameters
@@ -260,7 +285,7 @@ def eval_classifier(whole_generated, whole_groups, n_candidate, n_draw=5, log=Tr
         A dataframe summarizing metrics (f1_score, accuracy, auc) across settings.
     """
     if methods is None:
-        methods = ['LOGIS', 'SVM', 'KNN', 'RF', 'XGB']
+        methods = ["LOGIS", "SVM", "KNN", "RF", "XGB"]
 
     if not log:
         whole_generated = np.log2(whole_generated + 1)
@@ -276,16 +301,12 @@ def eval_classifier(whole_generated, whole_groups, n_candidate, n_draw=5, log=Tr
     group_indices_dict = {g: np.where(whole_groups == g)[0] for g in unique_groups}
 
     results = []
-    classifier_map = {
-        'LOGIS': LOGIS,
-        'SVM': SVM,
-        'KNN': KNN,
-        'RF': RF,
-        'XGB': XGB
-    }
+    classifier_map = {"LOGIS": LOGIS, "SVM": SVM, "KNN": KNN, "RF": RF, "XGB": XGB}
 
     for n_index, n in enumerate(n_candidate):
-        print(f"\nRunning sample size index {n_index + 1}/{len(n_candidate)} (n = {n})\n")
+        print(
+            f"\nRunning sample size index {n_index + 1}/{len(n_candidate)} (n = {n})\n"
+        )
         for draw in range(n_draw):
             indices = []
             for g in unique_groups:
@@ -301,12 +322,18 @@ def eval_classifier(whole_generated, whole_groups, n_candidate, n_draw=5, log=Tr
 
             # store scores for each classifier
             metrics = {
-                method: {'f1': [], 'accuracy': [], 'auc': []} for method in methods
+                method: {"f1": [], "accuracy": [], "auc": []} for method in methods
             }
 
             for train_index, test_index in skf.split(dat_candidate, labels_candidate):
-                train_data, test_data = dat_candidate[train_index], dat_candidate[test_index]
-                train_labels, test_labels = labels_candidate[train_index], labels_candidate[test_index]
+                train_data, test_data = (
+                    dat_candidate[train_index],
+                    dat_candidate[test_index],
+                )
+                train_labels, test_labels = (
+                    labels_candidate[train_index],
+                    labels_candidate[test_index],
+                )
 
                 non_zero_std = train_data.std(axis=0) != 0
                 train_data[:, non_zero_std] = scale(train_data[:, non_zero_std])
@@ -315,28 +342,32 @@ def eval_classifier(whole_generated, whole_groups, n_candidate, n_draw=5, log=Tr
                 for method in methods:
                     clf_func = classifier_map[method]
                     res = clf_func(train_data, train_labels, test_data, test_labels)
-                    metrics[method]['f1'].append(res['f1'])
-                    metrics[method]['accuracy'].append(res['accuracy'])
-                    metrics[method]['auc'].append(res['auc'])
+                    metrics[method]["f1"].append(res["f1"])
+                    metrics[method]["accuracy"].append(res["accuracy"])
+                    metrics[method]["auc"].append(res["auc"])
 
             for method in methods:
-                mean_f1 = np.mean(metrics[method]['f1'])
-                mean_acc = np.mean(metrics[method]['accuracy'])
-                mean_auc = np.mean(metrics[method]['auc'])
-                print(f"[n={n}, draw={draw}, method={method}] F1: {mean_f1:.4f}, Acc: {mean_acc:.4f}, AUC: {mean_auc:.4f}")
-                results.append({
-                    'total_size': n,
-                    'draw': draw,
-                    'method': method,
-                    'f1_score': mean_f1,
-                    'accuracy': mean_acc,
-                    'auc': mean_auc
-                })
+                mean_f1 = np.mean(metrics[method]["f1"])
+                mean_acc = np.mean(metrics[method]["accuracy"])
+                mean_auc = np.mean(metrics[method]["auc"])
+                print(
+                    f"[n={n}, draw={draw}, method={method}] F1: {mean_f1:.4f}, Acc: {mean_acc:.4f}, AUC: {mean_auc:.4f}"
+                )
+                results.append(
+                    {
+                        "total_size": n,
+                        "draw": draw,
+                        "method": method,
+                        "f1_score": mean_f1,
+                        "accuracy": mean_acc,
+                        "auc": mean_auc,
+                    }
+                )
 
     return pd.DataFrame(results)
 
 
-def heatmap_eval(dat_real,dat_generated=None):
+def heatmap_eval(dat_real, dat_generated=None):
     r"""
     This function creates a heatmap visualization comparing the generated data and the real data.
     dat_generated is applicable only if 2 sets of data is available.
@@ -347,33 +378,40 @@ def heatmap_eval(dat_real,dat_generated=None):
             the original copy of the data
     dat_generated : pd.DataFrame, optional
             the generated data
-    
+
     """
     if dat_generated is None:
         # Only plot dat_real if dat_generated is None
         plt.figure(figsize=(6, 6))
         sns.heatmap(dat_real, cbar=True)
-        plt.title('Real Data')
-        plt.xlabel('Features')
-        plt.ylabel('Samples')
+        plt.title("Real Data")
+        plt.xlabel("Features")
+        plt.ylabel("Samples")
     else:
         # Plot both dat_generated and dat_real side by side
-        fig, axs = plt.subplots(ncols=2, figsize=(12, 6),
-                                gridspec_kw=dict(width_ratios=[0.5, 0.55]))
+        fig, axs = plt.subplots(
+            ncols=2, figsize=(12, 6), gridspec_kw=dict(width_ratios=[0.5, 0.55])
+        )
 
         sns.heatmap(dat_generated, ax=axs[0], cbar=False)
-        axs[0].set_title('Generated Data')
-        axs[0].set_xlabel('Features')
-        axs[0].set_ylabel('Samples')
+        axs[0].set_title("Generated Data")
+        axs[0].set_xlabel("Features")
+        axs[0].set_ylabel("Samples")
 
         sns.heatmap(dat_real, ax=axs[1], cbar=True)
-        axs[1].set_title('Real Data')
-        axs[1].set_xlabel('Features')
-        axs[1].set_ylabel('Samples')
+        axs[1].set_title("Real Data")
+        axs[1].set_xlabel("Features")
+        axs[1].set_ylabel("Samples")
 
 
-
-def UMAP_eval(dat_generated, dat_real, groups_generated, groups_real, random_state = 42, legend_pos="top"):
+def UMAP_eval(
+    dat_generated,
+    dat_real,
+    groups_generated,
+    groups_real,
+    random_state=42,
+    legend_pos="top",
+):
     r"""
     This function creates a UMAP visualization comparing the generated data and the real data.
     If only 1 set of data is available, dat_generated and groups_generated should have None as inputs.
@@ -390,7 +428,7 @@ def UMAP_eval(dat_generated, dat_real, groups_generated, groups_real, random_sta
             the real groups
     legend_pos : string
             legend location
-    
+
     """
 
     if dat_generated is None and groups_generated is None:
@@ -398,17 +436,21 @@ def UMAP_eval(dat_generated, dat_real, groups_generated, groups_real, random_sta
         reducer = UMAP(random_state=random_state)
         embedding = reducer.fit_transform(dat_real.values)
 
-        umap_df = pd.DataFrame(embedding, columns=['UMAP1', 'UMAP2'])
-        umap_df['Group'] = groups_real.astype(str)  # Ensure groups are hashable for seaborn
+        umap_df = pd.DataFrame(embedding, columns=["UMAP1", "UMAP2"])
+        umap_df["Group"] = groups_real.astype(
+            str
+        )  # Ensure groups are hashable for seaborn
 
         # Plotting
         plt.figure(figsize=(10, 8))
-        sns.scatterplot(data=umap_df, x='UMAP1', y='UMAP2', style='Group', palette='bright')
-        plt.legend(title='Group', loc=legend_pos)
-        plt.title('UMAP Projection of Real Data')
+        sns.scatterplot(
+            data=umap_df, x="UMAP1", y="UMAP2", style="Group", palette="bright"
+        )
+        plt.legend(title="Group", loc=legend_pos)
+        plt.title("UMAP Projection of Real Data")
         plt.show()
         return
-    
+
     # Filter out features with zero variance in generated data
     non_zero_var_cols = dat_generated.var(axis=0) != 0
 
@@ -417,71 +459,101 @@ def UMAP_eval(dat_generated, dat_real, groups_generated, groups_real, random_sta
     dat_generated = dat_generated.loc[:, non_zero_var_cols]
 
     # Combine datasets
-    combined_data = np.vstack((dat_real.values, dat_generated.values))  
+    combined_data = np.vstack((dat_real.values, dat_generated.values))
     combined_groups = np.concatenate((groups_real, groups_generated))
-    combined_labels = np.array(['Real'] * dat_real.shape[0] + ['Generated'] * dat_generated.shape[0])
+    combined_labels = np.array(
+        ["Real"] * dat_real.shape[0] + ["Generated"] * dat_generated.shape[0]
+    )
 
     # Ensure that group labels are hashable and can be used in seaborn plots
-    combined_groups = [str(group) for group in combined_groups]  # Convert groups to string if not already
+    combined_groups = [
+        str(group) for group in combined_groups
+    ]  # Convert groups to string if not already
 
     # UMAP dimensionality reduction
     reducer = UMAP(random_state=random_state)
     embedding = reducer.fit_transform(combined_data)
 
-    umap_df = pd.DataFrame(embedding, columns=['UMAP1', 'UMAP2'])
-    umap_df['Data Type'] = combined_labels
-    umap_df['Group'] = combined_groups
+    umap_df = pd.DataFrame(embedding, columns=["UMAP1", "UMAP2"])
+    umap_df["Data Type"] = combined_labels
+    umap_df["Group"] = combined_groups
 
     # Plotting
     plt.figure(figsize=(10, 8))
-    sns.scatterplot(data=umap_df, x='UMAP1', y='UMAP2', hue='Data Type', style='Group', palette='bright')
-    plt.legend(title='Data Type/Group', loc="best")
-    plt.title('UMAP Projection of Real and Generated Data')
+    sns.scatterplot(
+        data=umap_df,
+        x="UMAP1",
+        y="UMAP2",
+        hue="Data Type",
+        style="Group",
+        palette="bright",
+    )
+    plt.legend(title="Data Type/Group", loc="best")
+    plt.title("UMAP Projection of Real and Generated Data")
     plt.show()
 
 
-
 def power_law(x, a, b, c):
-    return (1 - a) - (b * (x ** c))
+    return (1 - a) - (b * (x**c))
 
 
-
-def fit_curve(acc_table, metric_name, n_target=None, plot=True, ax=None, annotation=("Metric", "")):
+def fit_curve(
+    acc_table, metric_name, n_target=None, plot=True, ax=None, annotation=("Metric", "")
+):
     initial_params = [0, 1, -0.5]  # Adjust based on data inspection
     max_iterations = 50000  # Increase max iterations
 
-    popt, pcov = curve_fit(power_law, acc_table['n'], acc_table[metric_name], p0=initial_params, maxfev=max_iterations)
+    popt, pcov = curve_fit(
+        power_law,
+        acc_table["n"],
+        acc_table[metric_name],
+        p0=initial_params,
+        maxfev=max_iterations,
+    )
 
-    acc_table['predicted'] = power_law(acc_table['n'], *popt)
+    acc_table["predicted"] = power_law(acc_table["n"], *popt)
     epsilon = np.sqrt(np.finfo(float).eps)
-    jacobian = np.empty((len(acc_table['n']), len(popt)))
-    for i, x in enumerate(acc_table['n']):
+    jacobian = np.empty((len(acc_table["n"]), len(popt)))
+    for i, x in enumerate(acc_table["n"]):
         jacobian[i] = approx_fprime([x], lambda x: power_law(x[0], *popt), epsilon)
     pred_var = np.sum((jacobian @ pcov) * jacobian, axis=1)
     pred_std = np.sqrt(pred_var)
     t = norm.ppf(0.975)
-    acc_table['ci_low'] = acc_table['predicted'] - t * pred_std
-    acc_table['ci_high'] = acc_table['predicted'] + t * pred_std
+    acc_table["ci_low"] = acc_table["predicted"] - t * pred_std
+    acc_table["ci_high"] = acc_table["predicted"] + t * pred_std
 
     if plot:
         if ax is None:
             fig, ax = plt.subplots(figsize=(10, 6))
-        
-        ax.plot(acc_table['n'], acc_table['predicted'], label='Fitted', color='blue', linestyle='--')
-        ax.scatter(acc_table['n'], acc_table[metric_name], label='Actual Data', color='red')
-        ax.fill_between(acc_table['n'], acc_table['ci_low'], acc_table['ci_high'], color='blue', alpha=0.2, label='95% CI')
-        ax.set_xlabel('Sample Size')
-        ax.legend(loc='best')
+
+        ax.plot(
+            acc_table["n"],
+            acc_table["predicted"],
+            label="Fitted",
+            color="blue",
+            linestyle="--",
+        )
+        ax.scatter(
+            acc_table["n"], acc_table[metric_name], label="Actual Data", color="red"
+        )
+        ax.fill_between(
+            acc_table["n"],
+            acc_table["ci_low"],
+            acc_table["ci_high"],
+            color="blue",
+            alpha=0.2,
+            label="95% CI",
+        )
+        ax.set_xlabel("Sample Size")
+        ax.legend(loc="best")
         ax.set_title(annotation)
         ax.set_ylim(0.4, 1)
-      
 
-        
         if ax is None:
             plt.show()
         return ax
     return None
-    
+
 
 def get_data_metrics(real_file_name, generated_file_name):
     """
@@ -509,33 +581,40 @@ def get_data_metrics(real_file_name, generated_file_name):
     """
     # Load real dataset and drop non-feature column
     real = pd.read_csv(real_file_name, header=0)
-    real.drop(columns='samples', inplace=True)
+    real.drop(columns="samples", inplace=True)
 
     # Load generated dataset and assign same column names
     generated = pd.read_csv(generated_file_name, header=None, names=real.columns)
-    
-    unique_types = real['groups'].unique()
+
+    unique_types = real["groups"].unique()
     # Consistently encode the first and second group as 0 and 1
-    if not np.issubdtype(real['groups'].dtype, np.number):
+    if not np.issubdtype(real["groups"].dtype, np.number):
         type_map = {unique_types[0]: 0, unique_types[1]: 1}
-        real['groups'] = real['groups'].map(type_map)
-    
+        real["groups"] = real["groups"].map(type_map)
+
     # Extract group labels
     groups_real = real.groups
     groups_generated = generated.groups
-    
+
     # Extract feature matrices
     real_data = real.iloc[:, :-1]
     real_data = np.log2(real_data + 1)  # Log-transform real data
     generated_data = generated.iloc[:, :-1]
-    unique_types = real['groups'].unique() 
+    unique_types = real["groups"].unique()
 
     # Return processed matrices and labels
     return real_data, groups_real, generated_data, groups_generated, unique_types
 
 
-
-def visualize(real_data, groups_real, unique_types, generated_data=None, groups_generated=None, ratio=1, seed=42):
+def visualize(
+    real_data,
+    groups_real,
+    unique_types,
+    generated_data=None,
+    groups_generated=None,
+    ratio=1,
+    seed=42,
+):
     """
     Visualize real and optionally generated data using heatmap and UMAP projections.
 
@@ -575,7 +654,9 @@ def visualize(real_data, groups_real, unique_types, generated_data=None, groups_
         if generated_data is not None and groups_generated is not None:
             gen_idx = np.where(groups_generated == group)[0]
             if len(gen_idx) < n_sample:
-                raise ValueError(f"Not enough samples in generated data for group '{group}'")
+                raise ValueError(
+                    f"Not enough samples in generated data for group '{group}'"
+                )
             sampled_gen = np.random.choice(gen_idx, size=n_sample, replace=False)
             generated_indices.extend(sampled_gen.tolist())
 
@@ -585,7 +666,7 @@ def visualize(real_data, groups_real, unique_types, generated_data=None, groups_
     else:
         heatmap_eval(
             dat_real=real_data.iloc[real_indices, :],
-            dat_generated=generated_data.iloc[generated_indices, :]
+            dat_generated=generated_data.iloc[generated_indices, :],
         )
 
         # UMAP
@@ -594,14 +675,14 @@ def visualize(real_data, groups_real, unique_types, generated_data=None, groups_
             dat_generated=generated_data.iloc[generated_indices, :],
             groups_real=groups_real.iloc[real_indices],
             groups_generated=groups_generated.iloc[generated_indices],
-            legend_pos="bottom"
+            legend_pos="bottom",
         )
 
 
-
-
-def vis_classifier(metric_real, n_target, metric_generated=None, metric_name='f1_score', save = False):
-    r""" 
+def vis_classifier(
+    metric_real, n_target, metric_generated=None, metric_name="f1_score", save=False
+):
+    r"""
     Visualize the IPLF (learning curve) fitted from the real and optionally generated samples.
 
     Parameters
@@ -615,9 +696,9 @@ def vis_classifier(metric_real, n_target, metric_generated=None, metric_name='f1
     metric_name : str, default='f1_score'
         Metric to visualize. Options: 'f1_score', 'accuracy', 'auc'.
     """
-    methods = metric_real['method'].unique()
+    methods = metric_real["method"].unique()
     num_methods = len(methods)
-    
+
     # Adjust subplot layout
     cols = 2 if metric_generated is not None else 1
     fig, axs = plt.subplots(num_methods, cols, figsize=(15, 5 * num_methods))
@@ -626,29 +707,44 @@ def vis_classifier(metric_real, n_target, metric_generated=None, metric_name='f1
 
     # Helper: compute mean per sample size
     def mean_metrics(df, metric_name):
-        return df.groupby(['total_size', 'method']).agg({metric_name: 'mean'}).reset_index().rename(
-            columns={metric_name: metric_name, 'total_size': 'n'}
+        return (
+            df.groupby(["total_size", "method"])
+            .agg({metric_name: "mean"})
+            .reset_index()
+            .rename(columns={metric_name: metric_name, "total_size": "n"})
         )
 
     for i, method in enumerate(methods):
         print(method)
-        df_real = metric_real[metric_real['method'] == method]
+        df_real = metric_real[metric_real["method"] == method]
         mean_real = mean_metrics(df_real, metric_name)
 
         if metric_generated is not None:
-            df_gen = metric_generated[metric_generated['method'] == method]
+            df_gen = metric_generated[metric_generated["method"] == method]
             mean_gen = mean_metrics(df_gen, metric_name)
 
         # Plot real
         ax_real = axs[i] if cols == 1 else axs[i][0]
-        fit_curve(mean_real, metric_name, n_target=n_target, plot=True,
-                  ax=ax_real, annotation=(metric_name, f"{method}: Real"))
+        fit_curve(
+            mean_real,
+            metric_name,
+            n_target=n_target,
+            plot=True,
+            ax=ax_real,
+            annotation=(metric_name, f"{method}: Real"),
+        )
 
         # Plot generated
         if metric_generated is not None:
             ax_gen = axs[i][1]
-            fit_curve(mean_gen, metric_name, n_target=n_target, plot=True,
-                      ax=ax_gen, annotation=(metric_name, f"{method}: Generated"))
+            fit_curve(
+                mean_gen,
+                metric_name,
+                n_target=n_target,
+                plot=True,
+                ax=ax_gen,
+                annotation=(metric_name, f"{method}: Generated"),
+            )
 
     plt.tight_layout()
     # plt.show()
