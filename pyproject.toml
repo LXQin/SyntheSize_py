@@ -46,6 +46,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "ruff>=0.1.0",
+    "build>=0.10.0",
 ]
 docs = [
     "sphinx>=7.1.0",
