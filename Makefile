@@ -1,6 +1,6 @@
 # Makefile for synthesize Python Package
 
-.PHONY: help install install-dev clean test coverage lint format docs docs-serve build publish
+.PHONY: help install install-dev clean test coverage lint format docs docs-serve build publish docs-clean publish-test check init-dev version info
 
 # Default target
 help:
@@ -10,7 +10,11 @@ help:
 	@echo "Development:"
 	@echo "  make install       - Install package in regular mode"
 	@echo "  make install-dev   - Install package with development dependencies"
+	@echo "  make init-dev      - Initialize development environment (virtualenv)"
 	@echo "  make clean         - Remove build artifacts and cache files"
+	@echo "  make check         - Run linting and tests"
+	@echo "  make info          - Show Python and package info"
+	@echo "  make version       - Show package version"
 	@echo ""
 	@echo "Code Quality:"
 	@echo "  make test          - Run tests with pytest"
